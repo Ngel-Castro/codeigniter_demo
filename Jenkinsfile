@@ -11,10 +11,10 @@ pipeline {
     stages {
         stage('wainting for approval') {
             steps {
-                echo 'sleep 180'
+                sh "sleep 180"
             }
         }
-       
+    }
     stages {
         stage('Unit testing') {
             steps {
@@ -22,5 +22,4 @@ pipeline {
             }
         }
     }
-}
 }
