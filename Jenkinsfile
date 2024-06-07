@@ -13,6 +13,7 @@ pipeline {
             steps {
                 echo 'sleep 180'
             }
+        }
        
     stages {
         stage('Unit testing') {
