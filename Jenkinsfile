@@ -7,18 +7,14 @@ pipeline {
                 echo 'Hello World'
             }
         }
-    }
-    stages {
-        stage('wainting for approval') {
+        stage('waiting for approvals') {
             steps {
                 sh "sleep 180"
             }
         }
-    }
-    stages {
-        stage('Unit testing') {
+        stage('hello') {
             steps {
-                echo 'new unit testing'
+                echo 'test'
             }
         }
     }
