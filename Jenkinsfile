@@ -8,4 +8,17 @@ pipeline {
             }
         }
     }
+    stages {
+        stage('wainting for approval') {
+            steps {
+                echo 'sleep 180'
+            }
+       
+    stages {
+        stage('Unit testing') {
+            steps {
+                echo 'new unit testing'
+            }
+        }
+    }
 }
