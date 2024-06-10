@@ -1,18 +1,18 @@
 pipeline {
-    agent any
+    agent developer
 
     stages {
-        stage('Hello') {
+        stage('provision new infra') {
             steps {
-                echo 'Hello World'
+                sh "tofu --version"
             }
         }
-        stage('waiting for approvals') {
+        stage('email for approvals') {
             steps {
-                sh "sleep 180"
+                sh "Email for approvals"
             }
         }
-        stage('hello') {
+        stage('test') {
             steps {
                 echo 'test'
             }
