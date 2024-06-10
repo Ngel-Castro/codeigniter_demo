@@ -1,8 +1,8 @@
 pipeline {
     agent any
     environment {
-        //GIT_HASH = GIT_COMMIT.take(8)
-        GIT_HASH = "test-sever"
+        GIT_HASH = GIT_COMMIT.take(8)
+        //GIT_HASH = "test-sever"
         // Directory to store the Terraform state file
         TF_STATE_DIR = "${WORKSPACE}/permament/terraform.tfstate"
         TFVARS="env/dev/tofu.tfvars"
