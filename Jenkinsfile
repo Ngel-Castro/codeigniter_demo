@@ -5,6 +5,7 @@ pipeline {
         stage('provision new infra') {
             steps {
                 sh "tofu --version"
+                sh "ls"
             }
         }
         stage('email for approvals') {
