@@ -1,22 +1,60 @@
 pipeline {
     agent any
 
-    stages {
-        stage('provision new infra') {
+        stage('Change Directory') {
             steps {
-                sh "tofu --version"
-                sh "ls"
-            }
-        }
-        stage('email for approvals') {
-            steps {
-                sh ' echo "Email for approvals"'
-            }
-        }
-        stage('test') {
-            steps {
-                sh ' echo "something here" '
+                // Change directory to 'terraform'
+                dir('platform') {
+                    stage('OpenTofu Init') {
+                        steps {
+                            script {
+                                // Initialize Terraform
+                                sh """
+                                tofu init
+                                """
+                            }
+                        }
+                    }
+
+                    // stage('Terraform Plan') {
+                    //     steps {
+                    //         script {
+                    //             // Terraform plan to check the changes
+                    //             sh """
+                    //             tofu plan -out=tfplan
+                    //             """
+                    //         }
+                    //     }
+                    // }
+
+                    // stage('Terraform Apply') {
+                    //     steps {
+                    //         script {
+                    //             // Apply the planned changes
+                    //             sh """
+                    //             terraform tofu -auto-approve tfplan
+                    //             """
+                    //         }
+                    //     }
+                    // }
+                }
             }
         }
     }
+
+    post {
+        always {
+            // Clean up workspace after the job is done
+            cleanWs()
+        }
+        success {
+            // Actions to perform when the job succeeds
+            echo 'Infrastructure Apply successful!'
+        }
+        failure {
+            // Actions to perform when the job fails
+            echo 'Infrastructure Apply failed!'
+        }
+    }
 }
+
