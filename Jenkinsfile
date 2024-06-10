@@ -55,6 +55,25 @@ pipeline {
                 }
             }
         }
+
+        stage('running instance for couple of minutes') {
+            steps {
+                sh 'sleep 300'
+            }
+        }
+
+        stage('tofu destroy') {
+            steps {
+                // Change directory to 'tofu' and apply the planned changes
+                dir('platform/infra') {
+                    withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
+                        sh """
+                        tofu destroy -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        """
+                    }
+                }
+            }
+        }
     }
 
     post {
