@@ -57,16 +57,16 @@ pipeline {
             }
         }
 
-        stage('SSH to Remote Server') {
-            steps {
-                // Connect to the remote server and execute commands
-                sshagent(['ssh-key-web-server']) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no administrator@${WEB_SERVER_IP} 'ls -la'
-                    """
-                }
-            }
-        }
+        // stage('SSH to Remote Server') {
+        //     steps {
+        //         // Connect to the remote server and execute commands
+        //         sshagent(['ssh-key-web-server']) {
+        //             sh """
+        //             ssh -o StrictHostKeyChecking=no administrator@${WEB_SERVER_IP} 'ls -la'
+        //             """
+        //         }
+        //     }
+        // }
 
         stage('running instance for couple of minutes') {
             steps {
