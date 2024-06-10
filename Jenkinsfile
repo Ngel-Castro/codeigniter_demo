@@ -62,7 +62,7 @@ pipeline {
                 // Connect to the remote server and execute commands
                 sshagent(['ssh-key-web-server']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no administrator@${WEB_SERVER_IP}'ls -la'
+                    ssh -o StrictHostKeyChecking=no administrator@${WEB_SERVER_IP} 'ls -la'
                     """
                 }
             }
