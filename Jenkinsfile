@@ -1,5 +1,5 @@
 pipeline {
-    agent developer
+    agent any
 
     stages {
         stage('provision new infra') {
