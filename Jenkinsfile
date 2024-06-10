@@ -53,10 +53,10 @@ pipeline {
     }
 
     post {
-        always {
-            // Clean up workspace after the job is done
-            cleanWs()
-        }
+        // always {
+        //     // Clean up workspace after the job is done
+        //     cleanWs()
+        // }
         success {
             // Actions to perform when the job succeeds
             echo 'tofu Apply successful!'
