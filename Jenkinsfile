@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+    GIT_HASH = GIT_COMMIT.take(8)
+    }
 
     stages {
 
@@ -19,6 +22,7 @@ pipeline {
                 // Change directory to 'tofu' and plan the tofu changes
                 dir('platform/infra') {
                     sh """
+                    echo $GIT_HASH
                     tofu plan -out=tfplan
                     """
                 }
