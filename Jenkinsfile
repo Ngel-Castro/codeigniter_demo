@@ -3,7 +3,7 @@ pipeline {
     environment {
         GIT_HASH = GIT_COMMIT.take(8)
         // Directory to store the Terraform state file
-        TF_STATE_DIR = "${WORKSPACE}/terraform_state"
+        TF_STATE_DIR = "${WORKSPACE}/permament/terraform.tfstate"
     }
 
     stages {
@@ -22,7 +22,7 @@ pipeline {
                 // Change directory to 'tofu' and initialize tofu
                 dir('platform/infra') {
                     sh """
-                    tofu init -input=false -backend-config="path=${env.TF_STATE_DIR}/terraform.tfstate"
+                    tofu init
                     """
                 }
             }
@@ -34,7 +34,7 @@ pipeline {
                 dir('platform/infra') {
                     sh """
                     echo $GIT_HASH
-                    tofu plan -input=false -out=tfplan -state=${env.TF_STATE_DIR}/terraform.tfstate
+                    tofu plan -input=false -out=tfplan
                     """
                 }
             }
@@ -45,7 +45,7 @@ pipeline {
                 // Change directory to 'tofu' and apply the planned changes
                 dir('platform/infra') {
                     sh """
-                    tofu apply -input=false -auto-approve tfplan -state=${env.TF_STATE_DIR}/terraform.tfstate
+                    tofu apply -input=false -auto-approve tfplan
                     """
                 }
             }
