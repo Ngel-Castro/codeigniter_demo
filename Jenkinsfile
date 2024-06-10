@@ -9,7 +9,7 @@ pipeline {
         }
         stage('email for approvals') {
             steps {
-                sh "Email for approvals"
+                sh ' echo "Email for approvals"'
             }
         }
         stage('test') {
