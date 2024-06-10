@@ -1,14 +1,15 @@
 pipeline {
     agent any
 
+    stages {
         stage('Change Directory') {
             steps {
-                // Change directory to 'terraform'
+                // Change directory to 'tofu'
                 dir('platform') {
-                    stage('OpenTofu Init') {
+                    stage('tofu Init') {
                         steps {
                             script {
-                                // Initialize Terraform
+                                // Initialize tofu
                                 sh """
                                 tofu init
                                 """
@@ -16,27 +17,27 @@ pipeline {
                         }
                     }
 
-                    // stage('Terraform Plan') {
-                    //     steps {
-                    //         script {
-                    //             // Terraform plan to check the changes
-                    //             sh """
-                    //             tofu plan -out=tfplan
-                    //             """
-                    //         }
-                    //     }
-                    // }
+                    stage('tofu Plan') {
+                        steps {
+                            script {
+                                // tofu plan to check the changes
+                                sh """
+                                tofu plan -out=tfplan
+                                """
+                            }
+                        }
+                    }
 
-                    // stage('Terraform Apply') {
-                    //     steps {
-                    //         script {
-                    //             // Apply the planned changes
-                    //             sh """
-                    //             terraform tofu -auto-approve tfplan
-                    //             """
-                    //         }
-                    //     }
-                    // }
+                    stage('tofu Apply') {
+                        steps {
+                            script {
+                                // Apply the planned changes
+                                sh """
+                                tofu apply -auto-approve tfplan
+                                """
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -49,12 +50,11 @@ pipeline {
         }
         success {
             // Actions to perform when the job succeeds
-            echo 'Infrastructure Apply successful!'
+            echo 'tofu Apply successful!'
         }
         failure {
             // Actions to perform when the job fails
-            echo 'Infrastructure Apply failed!'
+            echo 'tofu Apply failed!'
         }
     }
 }
-
