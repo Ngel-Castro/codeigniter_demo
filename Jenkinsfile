@@ -1,13 +1,12 @@
 pipeline {
     agent any
 
-
     stages {
 
         stage('tofu Init') {
             steps {
                 // Change directory to 'tofu' and initialize tofu
-                dir('platform') {
+                dir('platform/infra') {
                     sh """
                     tofu init
                     """
@@ -18,7 +17,7 @@ pipeline {
         stage('tofu Plan') {
             steps {
                 // Change directory to 'tofu' and plan the tofu changes
-                dir('platform') {
+                dir('platform/infra') {
                     sh """
                     tofu plan -out=tfplan
                     """
@@ -29,7 +28,7 @@ pipeline {
         stage('tofu Apply') {
             steps {
                 // Change directory to 'tofu' and apply the planned changes
-                dir('platform') {
+                dir('platform/infra') {
                     sh """
                     tofu apply -auto-approve tfplan
                     """
