@@ -36,7 +36,7 @@ pipeline {
                 dir('platform/infra') {
                     withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
                         sh """
-                        tofu plan -out=tfplan -var-file=${env.TFVARS} -var="name=${$GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        tofu plan -out=tfplan -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
                     }
                 }
@@ -49,7 +49,7 @@ pipeline {
                 dir('platform/infra') {
                     withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
                         sh """
-                        tofu apply -auto-approve tfplan -var-file=${env.TFVARS} -var="name=${$GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        tofu apply -auto-approve tfplan -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
                     }
                 }
