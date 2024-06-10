@@ -1,43 +1,38 @@
 pipeline {
     agent any
 
+
     stages {
-        stage('Change Directory') {
+
+        stage('tofu Init') {
             steps {
-                // Change directory to 'tofu'
+                // Change directory to 'tofu' and initialize tofu
                 dir('platform') {
-                    stage('tofu Init') {
-                        steps {
-                            script {
-                                // Initialize tofu
-                                sh """
-                                tofu init
-                                """
-                            }
-                        }
-                    }
+                    sh """
+                    tofu init
+                    """
+                }
+            }
+        }
 
-                    stage('tofu Plan') {
-                        steps {
-                            script {
-                                // tofu plan to check the changes
-                                sh """
-                                tofu plan -out=tfplan
-                                """
-                            }
-                        }
-                    }
+        stage('tofu Plan') {
+            steps {
+                // Change directory to 'tofu' and plan the tofu changes
+                dir('platform') {
+                    sh """
+                    tofu plan -out=tfplan
+                    """
+                }
+            }
+        }
 
-                    stage('tofu Apply') {
-                        steps {
-                            script {
-                                // Apply the planned changes
-                                sh """
-                                tofu apply -auto-approve tfplan
-                                """
-                            }
-                        }
-                    }
+        stage('tofu Apply') {
+            steps {
+                // Change directory to 'tofu' and apply the planned changes
+                dir('platform') {
+                    sh """
+                    tofu apply -auto-approve tfplan
+                    """
                 }
             }
         }
