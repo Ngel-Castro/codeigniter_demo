@@ -1,9 +1,11 @@
 pipeline {
     agent any
     environment {
-        GIT_HASH = GIT_COMMIT.take(8)
+        //GIT_HASH = GIT_COMMIT.take(8)
+        GIT_HASH = "test-sever"
         // Directory to store the Terraform state file
         TF_STATE_DIR = "${WORKSPACE}/permament/terraform.tfstate"
+        TFVARS="env/dev/tofu.tfvars"
     }
 
     stages {
@@ -32,10 +34,11 @@ pipeline {
             steps {
                 // Change directory to 'tofu' and plan the tofu changes
                 dir('platform/infra') {
-                    sh """
-                    echo $GIT_HASH
-                    tofu plan -input=false -out=tfplan
-                    """
+                    withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
+                        sh """
+                        tofu plan -out=tfplan -var-file=${env.TFVARS} -var="name=${$GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        """
+                    }
                 }
             }
         }
@@ -44,9 +47,11 @@ pipeline {
             steps {
                 // Change directory to 'tofu' and apply the planned changes
                 dir('platform/infra') {
-                    sh """
-                    tofu apply -input=false -auto-approve tfplan
-                    """
+                    withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
+                        sh """
+                        tofu apply -auto-approve tfplan -var-file=${env.TFVARS} -var="name=${$GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        """
+                    }
                 }
             }
         }
