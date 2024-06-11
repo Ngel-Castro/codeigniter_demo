@@ -54,8 +54,8 @@ pipeline {
                     }
                 script {
                     // Execute a shell command and capture its output
-                    def commandOutput = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
-                    echo "Output from shell command: ${commandOutput}"
+                    def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
+                    echo "Output from shell command: ${vm_ip}"
                 }
                 }
             }
