@@ -68,7 +68,7 @@ pipeline {
                     // Connect to the remote server and execute command
                     sshagent(['ssh-key-credential']) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'git --version'
+                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'git clone git@github.com:Ngel-Castro/codeigniter_demo.git'
                         """
                     }
                 }
