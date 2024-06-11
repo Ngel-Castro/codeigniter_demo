@@ -66,7 +66,7 @@ pipeline {
             steps {
                 script {
                     // Connect to the remote server and execute command
-                    sshagent(['my-ssh-credentials-id']) {
+                    sshagent(['ssh-key-credentials']) {
                         sh '''
                         ssh administrator@${env.VM_IP} "ls -la"
                         '''
