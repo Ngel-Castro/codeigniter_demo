@@ -52,22 +52,24 @@ pipeline {
                         tofu apply -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
                     }
-                script {
-                    // Execute a shell command and capture its output
-                    def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
-                    echo "Output from shell command: ${vm_ip}"
-                }
+                    script {
+                        // Execute a shell command and capture its output
+                        def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
+                        echo "Output from shell command: ${vm_ip}"
+                    }
                 }
             }
         }
 
         stage('SSH to Remote Server') {
             steps {
-                // Connect to the remote server and execute commands
-                withCredentials([file(credentialsId: 'ssh-key-web-server', variable: 'SSH_KEY_FILE')]) {
-                    sh """
-                    ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no administrator@${vm_ip} 'ls -la'
-                    """
+                script {
+                    // Connect to the remote server and execute commands
+                    withCredentials([file(credentialsId: 'ssh-key-web-server', variable: 'SSH_KEY_FILE')]) {
+                        sh """
+                        ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no administrator@${vm_ip} 'ls -la'
+                        """
+                    }
                 }
             }
         }
