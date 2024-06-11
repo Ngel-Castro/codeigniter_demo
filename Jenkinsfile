@@ -69,7 +69,7 @@ pipeline {
                     withCredentials([file(credentialsId: 'ssh-key-web-server', variable: 'SSH_KEY_FILE')]) {
                         //
                         sh """
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY_FILE} administrator@${env.VM_IP} 'ls -la'
+                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'ls -la'
                         """
                     }
                 }
