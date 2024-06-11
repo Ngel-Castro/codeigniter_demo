@@ -66,8 +66,9 @@ pipeline {
                 script {
                     // Connect to the remote server and execute commands
                     withCredentials([file(credentialsId: 'ssh-key-web-server', variable: 'SSH_KEY_FILE')]) {
+                        //ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no administrator@${vm_ip} 'ls -la'
                         sh """
-                        ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no administrator@${vm_ip} 'ls -la'
+                        echo ${vm_ip}
                         """
                     }
                 }
@@ -76,7 +77,7 @@ pipeline {
 
         stage('running instance for couple of minutes') {
             steps {
-                sh 'sleep 300'
+                sh 'sleep 100'
             }
         }
 
