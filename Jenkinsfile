@@ -65,12 +65,11 @@ pipeline {
         stage('SSH to Remote Server') {
             steps {
                 script {
-                    // Connect to the remote server and execute commands
-                    withCredentials([file(credentialsId: 'ssh-key-web-server', variable: 'SSH_KEY_FILE')]) {
-                        //
-                        sh """
-                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'ls -la'
-                        """
+                    // Connect to the remote server and execute command
+                    sshagent(['my-ssh-credentials-id']) {
+                        sh '''
+                        ssh administrator@${env.VM_IP} "ls -la"
+                        '''
                     }
                 }
             }
