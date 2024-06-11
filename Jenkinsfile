@@ -64,9 +64,9 @@ pipeline {
         stage('SSH to Remote Server') {
             steps {
                 // Connect to the remote server and execute commands
-                sshUserPrivateKey(['ssh-key-web-server']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-web-server', keyFileVariable: 'SSH_KEY')]) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no administrator@${vm_ip} 'ls -la'
+                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no administrator@${vm_ip} 'ls -la'
                     """
                 }
             }
