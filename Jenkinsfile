@@ -62,13 +62,13 @@ pipeline {
             }
         }
 
-        stage('SSH to Remote Server') {
+        stage('SSH to Development server') {
             steps {
                 script {
                     // Connect to the remote server and execute command
                     sshagent(['ssh-key-credential']) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'git clone git@github.com:Ngel-Castro/codeigniter_demo.git'
+                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'git clone git@github.com:Ngel-Castro/codeigniter_demo.git -b main'
                         """
                     }
                 }
