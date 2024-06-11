@@ -55,7 +55,8 @@ pipeline {
                     script {
                         // Execute a shell command and capture its output
                         def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
-                        echo "Output from shell command: ${vm_ip}"
+                        env.VM_IP = vm_ip
+                        echo "Output from shell command: ${env.VM_IP}"
                     }
                 }
             }
@@ -68,7 +69,7 @@ pipeline {
                     withCredentials([file(credentialsId: 'ssh-key-web-server', variable: 'SSH_KEY_FILE')]) {
                         //ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no administrator@${vm_ip} 'ls -la'
                         sh """
-                        echo ${vm_ip}
+                        echo ${env.VM_IP}
                         """
                     }
                 }
