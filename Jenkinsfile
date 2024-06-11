@@ -50,10 +50,13 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
                         sh """
                         tofu apply -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
-                        tofu output -json vm-ip
                         """
                     }
-                    def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
+                script {
+                    // Execute a shell command and capture its output
+                    def commandOutput = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
+                    echo "Output from shell command: ${commandOutput}"
+                }
                 }
             }
         }
