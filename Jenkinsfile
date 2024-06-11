@@ -53,20 +53,21 @@ pipeline {
                         tofu output -json vm-ip
                         """
                     }
+                    def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
                 }
             }
         }
 
-        // stage('SSH to Remote Server') {
-        //     steps {
-        //         // Connect to the remote server and execute commands
-        //         sshagent(['ssh-key-web-server']) {
-        //             sh """
-        //             ssh -o StrictHostKeyChecking=no administrator@${WEB_SERVER_IP} 'ls -la'
-        //             """
-        //         }
-        //     }
-        // }
+        stage('SSH to Remote Server') {
+            steps {
+                // Connect to the remote server and execute commands
+                sshagent(['ssh-key-web-server']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no administrator@${vm_ip} 'ls -la'
+                    """
+                }
+            }
+        }
 
         stage('running instance for couple of minutes') {
             steps {
