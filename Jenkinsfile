@@ -67,9 +67,9 @@ pipeline {
                 script {
                     // Connect to the remote server and execute commands
                     withCredentials([file(credentialsId: 'ssh-key-web-server', variable: 'SSH_KEY_FILE')]) {
-                        //ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no administrator@${vm_ip} 'ls -la'
+                        //
                         sh """
-                        echo ${env.VM_IP}
+                        ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'ls -la'
                         """
                     }
                 }
