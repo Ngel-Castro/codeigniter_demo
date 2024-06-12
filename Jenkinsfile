@@ -43,43 +43,43 @@ pipeline {
             }
         }
 
-        stage('tofu Apply') {
-            steps {
-                // Change directory to 'tofu' and apply the planned changes
-                dir('platform/infra') {
-                    withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
-                        sh """
-                        tofu apply -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
-                        """
-                    }
-                    script {
-                        // Execute a shell command and capture its output
-                        def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
-                        env.VM_IP = vm_ip
-                        echo "Output from shell command: ${env.VM_IP}"
-                    }
-                }
-            }
-        }
+        // stage('tofu Apply') {
+        //     steps {
+        //         // Change directory to 'tofu' and apply the planned changes
+        //         dir('platform/infra') {
+        //             withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
+        //                 sh """
+        //                 tofu apply -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+        //                 """
+        //             }
+        //             script {
+        //                 // Execute a shell command and capture its output
+        //                 def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
+        //                 env.VM_IP = vm_ip
+        //                 echo "Output from shell command: ${env.VM_IP}"
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('SSH to Development server') {
-            steps {
-                script {
-                    // Connect to the remote server and execute command
-                    sshagent(['ssh-key-credential']) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'git clone git@github.com:Ngel-Castro/codeigniter_demo.git -b main && composer --version'
-                        """
-                    }
-                }
-            }
-        }
+        // stage('SSH to Development server') {
+        //     steps {
+        //         script {
+        //             // Connect to the remote server and execute command
+        //             sshagent(['ssh-key-credential']) {
+        //                 sh """
+        //                 ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'git clone git@github.com:Ngel-Castro/codeigniter_demo.git -b main && composer --version'
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('running instance for couple of minutes') {
-            steps {
-                sh 'sleep 100'
-            }
-        }
+        // stage('running instance for couple of minutes') {
+        //     steps {
+        //         sh 'sleep 100'
+        //     }
+        // }
 
         stage('tofu destroy') {
             steps {
