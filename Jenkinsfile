@@ -84,7 +84,7 @@ pipeline {
 
         stage('Copy Script to Remote Server') {
             steps {
-                sshagent(credentials: [env.SSH_CREDENTIALS_ID]) {
+                sshagent(credentials: ['ssh-key-credential']) {
                     sh """
                     scp -o StrictHostKeyChecking=no deployment_script.sh ${env.VM_IP}:/tmp/
                     """
@@ -96,7 +96,7 @@ pipeline {
             steps {
                 script {
                     // Connect to the remote server and execute command
-                    sshagent([env.SSH_CREDENTIALS_ID]) {
+                    sshagent(['ssh-key-credential']) {
                         sh """
                         ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'bash /tmp/deployment_script.sh'
                         """
