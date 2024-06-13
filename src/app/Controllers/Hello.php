@@ -2,9 +2,9 @@
 
 namespace App\Controllers;
 
-class Home extends BaseController
+class Hello extends BaseController
 {
-    public function index(): string
+    public function index()
     {
         echo 'IMTA Codeigniter POC!';
     }
