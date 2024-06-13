@@ -71,7 +71,7 @@ pipeline {
                     #!/bin/bash
                     echo "Deployment commit in to Web Server"
                     git clone git@github.com:Ngel-Castro/codeigniter_demo.git -b feature/infra
-                    cp -R codeigniter_demo/src/* /var/www/html/app/
+                    sudo cp -R codeigniter_demo/src/* /var/www/html/app/
                     sudo chown -R www-data:www-data /var/www/html/app
                     sudo chmod -R 755 /var/www/html/app
                     sudo cp codeigniter_demo/app.conf /etc/apache2/sites-available/app.conf
