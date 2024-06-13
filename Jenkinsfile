@@ -107,7 +107,7 @@ pipeline {
 
         stage('running instance for couple of minutes') {
             steps {
-                sh 'sleep 100'
+                sh 'sleep 180'
             }
         }
 
