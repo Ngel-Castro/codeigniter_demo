@@ -7,6 +7,7 @@ pipeline {
         TF_STATE_DIR = "${WORKSPACE}/permament/terraform.tfstate"
         TFVARS="env/dev/tofu.tfvars"
         SSH_CREDENTIALS_ID = "ssh-key-credential"
+        PROXMOX_CREDENITALS_ID = "proxmox-credentials"
     }
 
     stages {
@@ -35,7 +36,7 @@ pipeline {
             steps {
                 // Change directory to 'tofu' and plan the tofu changes
                 dir('platform/infra') {
-                    withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
+                    withCredentials([usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
                         sh """
                         tofu plan -out=tfplan -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
@@ -48,7 +49,7 @@ pipeline {
             steps {
                 // Change directory to 'tofu' and apply the planned changes
                 dir('platform/infra') {
-                    withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
+                    withCredentials([usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
                         sh """
                         tofu apply -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
@@ -115,7 +116,7 @@ pipeline {
             steps {
                 // Change directory to 'tofu' and apply the planned changes
                 dir('platform/infra') {
-                    withCredentials([usernamePassword(credentialsId: 'PROXMOX_CREDENTIALS', usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
+                    withCredentials([usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')]) {
                         sh """
                         tofu destroy -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
