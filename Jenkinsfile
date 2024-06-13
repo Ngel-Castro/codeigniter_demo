@@ -6,6 +6,7 @@ pipeline {
         // Directory to store the Terraform state file
         TF_STATE_DIR = "${WORKSPACE}/permament/terraform.tfstate"
         TFVARS="env/dev/tofu.tfvars"
+        SSH_CREDENTIALS_ID = "ssh-key-credential"
     }
 
     stages {
@@ -62,13 +63,42 @@ pipeline {
             }
         }
 
+       stage('Prepare Script') {
+            steps {
+                // Create a sample script file to be executed on the remote server
+                script {
+                    writeFile file: 'deployment_script.sh', text: """
+                    #!/bin/bash
+                    echo "Deployment commit in to Web Server"
+                    git clone git@github.com:Ngel-Castro/codeigniter_demo.git -b feature/infra
+                    cp -R codeigniter_demo/src/* /var/www/html/app/
+                    sudo chown -R www-data:www-data /var/www/html/app
+                    sudo chmod -R 755 /var/www/html/app
+                    sudo cp codeigniter_demo/app.conf /etc/apache2/sites-available/app.conf
+                    rm -rf codeigniter_demo
+                    sudo systemctl restart apache2
+                    """
+                }
+            }
+       }
+
+        stage('Copy Script to Remote Server') {
+            steps {
+                sshagent(credentials: [env.SSH_CREDENTIALS_ID]) {
+                    sh """
+                    scp -o StrictHostKeyChecking=no deployment_script.sh ${env.VM_IP}:/tmp/
+                    """
+                }
+            }
+        }
+
         stage('SSH to Development server') {
             steps {
                 script {
                     // Connect to the remote server and execute command
-                    sshagent(['ssh-key-credential']) {
+                    sshagent([env.SSH_CREDENTIALS_ID]) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'git clone git@github.com:Ngel-Castro/codeigniter_demo.git -b main && composer --version'
+                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'bash /tmp/deployment_script.sh'
                         """
                     }
                 }
