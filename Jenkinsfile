@@ -8,6 +8,7 @@ pipeline {
         TFVARS="env/dev/tofu.tfvars"
         SSH_CREDENTIALS_ID = "ssh-key-credential"
         PROXMOX_CREDENITALS_ID = "proxmox-credentials"
+        REMOTE_HOME = "/home/administrator/"
     }
 
     stages {
@@ -71,13 +72,12 @@ pipeline {
                     writeFile file: 'deployment_script.sh', text: """
                     #!/bin/bash
                     echo "Deployment commit in to Web Server"
-                    git clone git@github.com:Ngel-Castro/codeigniter_demo.git -b main
                     sudo mkdir -p /var/www/html/app/
-                    sudo cp -R codeigniter_demo/src/* /var/www/html/app/
+                    sudo cp -R src/* /var/www/html/app/
                     sudo chown -R www-data:www-data /var/www/html/app
                     sudo chmod -R 755 /var/www/html/app
-                    sudo cp codeigniter_demo/app.conf /etc/apache2/sites-available/app.conf
-                    rm -rf codeigniter_demo
+                    sudo mv app.conf /etc/apache2/sites-available/app.conf
+                    rm -rf src/
                     sudo systemctl restart apache2
                     """
                 }
@@ -88,8 +88,9 @@ pipeline {
             steps {
                 sshagent([env.SSH_CREDENTIALS_ID]) {
                     sh """
-                    ls -la 
                     scp -o StrictHostKeyChecking=no deployment_script.sh administrator@${env.VM_IP}:/tmp/
+                    scp -o StrictHostKeyChecking=no app.conf administrator@${env.VM_IP}:${REMOTE_HOME}
+                    scp -r  -o StrictHostKeyChecking=no src/ administrator@${env.VM_IP}:${REMOTE_HOME}
                     """
                 }
             }
