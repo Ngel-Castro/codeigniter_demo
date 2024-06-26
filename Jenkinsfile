@@ -88,6 +88,7 @@ pipeline {
             steps {
                 sshagent([env.SSH_CREDENTIALS_ID]) {
                     sh """
+                    ls -la 
                     scp -o StrictHostKeyChecking=no deployment_script.sh administrator@${env.VM_IP}:/tmp/
                     """
                 }
