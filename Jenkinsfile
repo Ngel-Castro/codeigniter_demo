@@ -40,9 +40,9 @@ pipeline {
             steps {
                 // Change directory to 'tofu' and plan the tofu changes
                 dir('platform/infra') {
-                    withCredentials(
-                        [usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')],
-                        [string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                    withCredentials([
+                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                         sh """
                         tofu plan -out=tfplan -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
@@ -55,9 +55,9 @@ pipeline {
             steps {
                 // Change directory to 'tofu' and apply the planned changes
                 dir('platform/infra') {
-                    withCredentials(
-                        [usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')],
-                        [string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                    withCredentials([
+                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                         sh """
                         tofu apply -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
@@ -126,9 +126,9 @@ pipeline {
             steps {
                 // Change directory to 'tofu' and apply the planned changes
                 dir('platform/infra') {
-                    withCredentials(
-                        [usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET')],
-                        [string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                    withCredentials([
+                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                         sh """
                         tofu destroy -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
