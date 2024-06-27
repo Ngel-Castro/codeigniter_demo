@@ -1,5 +1,6 @@
 terraform {
-  backend "local" {
-    path = "permament/terraform.tfstate"
+  backend "consul" {
+    path    = "statefiles/codeigniter"
+    scheme  = "http"
   }
 }
