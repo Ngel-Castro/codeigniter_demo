@@ -71,7 +71,7 @@ pipeline {
                 script {
                     writeFile file: 'deployment_script.sh', text: """
                     #!/bin/bash
-                    echo "Deployment commit in to Web Server"
+                    echo "Deployment commit ${GIT_HASH} in to Web Server"
                     sudo mkdir -p /var/www/html/app/
                     sudo cp -R src/* /var/www/html/app/
                     sudo chown -R www-data:www-data /var/www/html/app
@@ -111,7 +111,7 @@ pipeline {
 
         stage('running instance for couple of minutes') {
             steps {
-                sh 'sleep 180'
+                sh 'sleep 300'
             }
         }
 
