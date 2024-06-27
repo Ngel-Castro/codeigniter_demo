@@ -64,9 +64,11 @@ pipeline {
                     }
                     script {
                         // Execute a shell command and capture its output
-                        def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
-                        env.VM_IP = vm_ip
-                        echo "Output from shell command: ${env.VM_IP}"
+                        withCredentials([string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                            def vm_ip = sh(script: 'tofu output -json vm-ip', returnStdout: true).trim()
+                            env.VM_IP = vm_ip
+                            echo "Output from shell command: ${env.VM_IP}"
+                        }
                     }
                 }
             }
