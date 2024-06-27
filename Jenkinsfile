@@ -29,7 +29,6 @@ pipeline {
                 dir('platform/infra') {
                     withCredentials([string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                         sh """
-                        echo ${CONSUL_HTTP_TOKEN} >> test.txt
                         tofu init -backend-config="address=consul-prod.home:8500"
                         """
                     }
@@ -140,10 +139,10 @@ pipeline {
     }
 
     post {
-        // always {
-        //     // Clean up workspace after the job is done
-        //     cleanWs()
-        // }
+        always {
+            // Clean up workspace after the job is done
+            cleanWs()
+        }
         success {
             // Actions to perform when the job succeeds
             echo 'tofu Apply successful!'
