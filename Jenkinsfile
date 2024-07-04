@@ -14,15 +14,6 @@ pipeline {
 
     stages {
 
-        stage('Prepare State Directory') {
-            steps {
-                script {
-                    // Ensure the state directory exists
-                    sh "mkdir -p ${env.TF_STATE_DIR}"
-                }
-            }
-        }
-
         stage('tofu Init') {
             steps {
                 // Change directory to 'tofu' and initialize tofu
@@ -36,31 +27,12 @@ pipeline {
             }
         }
 
-        stage('tofu Plan') {
-            steps {
-                // Change directory to 'tofu' and plan the tofu changes
-                dir('platform/infra') {
-                    withCredentials([
-                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
-                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
-                        sh """
-                        tofu plan -out=tfplan -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
-                        """
-                    }
-                }
-            }
-        }
-
-        stage('tofu Apply') {
+        stage('tofu get IP') {
             steps {
                 // Change directory to 'tofu' and apply the planned changes
                 dir('platform/infra') {
                     withCredentials([
-                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
                         string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
-                        sh """
-                        tofu apply -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
-                        """
                     }
                     script {
                         // Execute a shell command and capture its output
@@ -97,9 +69,9 @@ pipeline {
             steps {
                 sshagent([env.SSH_CREDENTIALS_ID]) {
                     sh """
-                    scp -o StrictHostKeyChecking=no deployment_script.sh administrator@${env.VM_IP}:/tmp/
-                    scp -o StrictHostKeyChecking=no app.conf administrator@${env.VM_IP}:${REMOTE_HOME}
-                    scp -r  -o StrictHostKeyChecking=no src/ administrator@${env.VM_IP}:${REMOTE_HOME}
+                    scp -o StrictHostKeyChecking=no deployment_script.sh root@${env.VM_IP}:/tmp/
+                    scp -o StrictHostKeyChecking=no app.conf root@${env.VM_IP}:${REMOTE_HOME}
+                    scp -r  -o StrictHostKeyChecking=no src/ root@${env.VM_IP}:${REMOTE_HOME}
                     """
                 }
             }
@@ -111,28 +83,7 @@ pipeline {
                     // Connect to the remote server and execute command
                     sshagent([env.SSH_CREDENTIALS_ID]) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no administrator@${env.VM_IP} 'bash /tmp/deployment_script.sh'
-                        """
-                    }
-                }
-            }
-        }
-
-        stage('running instance for couple of minutes') {
-            steps {
-                sh 'sleep 300'
-            }
-        }
-
-        stage('tofu destroy') {
-            steps {
-                // Change directory to 'tofu' and apply the planned changes
-                dir('platform/infra') {
-                    withCredentials([
-                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
-                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
-                        sh """
-                        tofu destroy -auto-approve -var-file=${env.TFVARS} -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        ssh -o StrictHostKeyChecking=no root@${env.VM_IP} 'bash /tmp/deployment_script.sh'
                         """
                     }
                 }
