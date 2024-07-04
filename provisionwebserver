@@ -86,6 +86,34 @@ pipeline {
                 }
             }
         }
+
+        stage('Probe SSH Connection') {
+            steps {
+                script {
+                    def maxTime = 300 // 5 minutes in seconds
+                    def interval = 10 // 10 seconds
+                    def timeElapsed = 0
+                    def reachable = false
+                    
+                    while (timeElapsed < maxTime) {
+                        def result = sh(script: "nc -zv ${env.LXC_IP} 22", returnStatus: true)
+                        if (result == 0) {
+                            reachable = true
+                            break
+                        }
+                        sleep(interval)
+                        timeElapsed += interval
+                    }
+                    
+                    if (!reachable) {
+                        error "Host ${env.LXC_IP} is not reachable after ${maxTime} seconds"
+                    } else {
+                        echo "Host ${env.LXC_IP} is reachable"
+                    }
+                }
+            }
+        }
+
         stage('run ansible') {
             steps {
                 dir('platform/ansible') {
@@ -94,7 +122,6 @@ pipeline {
                             usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
                             string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                             sh """
-                            sleep 30
                             ansible-playbook -i ${INVENTORY_FILE} main.yml
                             """
                         }
