@@ -94,6 +94,7 @@ pipeline {
                     ls -la
                     """
                 }
+            }
         }
 
         // stage('tofu destroy') {
