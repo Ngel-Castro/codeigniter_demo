@@ -1,6 +1,6 @@
 terraform {
   backend "consul" {
-    path    = "statefiles/codeigniter"
+    path    = "statefiles/lxc-codeigniter"
     scheme  = "http"
   }
 }
