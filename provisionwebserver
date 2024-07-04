@@ -76,15 +76,24 @@ pipeline {
                             def lxc_ip = sh(script: 'tofu output -json lxc-ip', returnStdout: true).trim()
                             extractIpFromJson(lxc_ip)
                             echo "Output from shell command: ${env.LXC_IP}"
+                            sh """
+                            mv inventory_dev.yaml ../ansible/inventory/web/
+                            """
                         }
                     }
                 }
             }
         }
         stage('run ansible') {
-            steps {
-                sh 'ansible --version'
-            }
+            dir('platform/ansible') {
+                withCredentials([
+                    usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                    string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                    sh """
+                    ansible --version
+                    ls -la
+                    """
+                }
         }
 
         // stage('tofu destroy') {
