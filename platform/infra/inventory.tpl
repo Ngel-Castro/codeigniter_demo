@@ -1,11 +1,11 @@
 all:
   children:
 %{ for idx, vm in jsondecode(vms_inventory) ~}
-  ${vm.name}:
+    ${vm.name}:
         children:
-          manager:
+            manager:
             hosts:
-              ${vm.name}1:
+                ${vm.name}1:
                 ansible_host: "${vm.ip}"
                 ansible_user: "root"
                 ansible_ssh_private_key_file: '{{ cluster_ssh_key }}'
