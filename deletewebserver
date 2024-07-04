@@ -10,6 +10,7 @@ pipeline {
         PROXMOX_CREDENITALS_ID = "proxmox-credentials"
         REMOTE_HOME = "/home/administrator/"
         CONSUL_CREDENTIAL_ID = "consul-sa-token"
+        CONSUL_SERVER = "consul-prod.home"
     }
 
     stages {
@@ -29,7 +30,7 @@ pipeline {
                 dir('platform/infra') {
                     withCredentials([string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                         sh """
-                        tofu init -backend-config="address=consul-prod.home:8500"
+                        tofu init -backend-config="address=${env.CONSUL_SERVER}:8500"
                         """
                     }
                 }
