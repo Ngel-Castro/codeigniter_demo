@@ -10,6 +10,7 @@ pipeline {
         PROXMOX_CREDENITALS_ID = "proxmox-credentials"
         REMOTE_HOME = "/home/administrator/"
         CONSUL_CREDENTIAL_ID = "consul-sa-token"
+        INVENTORY_FILE= "inventory/web/inventory_dev.yaml"
     }
 
     stages {
@@ -77,7 +78,7 @@ pipeline {
                             extractIpFromJson(lxc_ip)
                             echo "Output from shell command: ${env.LXC_IP}"
                             sh """
-                            mv inventory_dev.yaml ../ansible/inventory/web/
+                            mv inventory_dev.yaml ../ansible/${env.INVENTORY_FILE}
                             """
                         }
                     }
@@ -93,7 +94,7 @@ pipeline {
                             string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                             sh """
                             ansible --version
-                            ls -la
+                            cat ${env.INVENTORY_FILE}
                             """
                         }
                     }
