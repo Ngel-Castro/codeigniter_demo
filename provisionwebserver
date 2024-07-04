@@ -65,15 +65,16 @@ pipeline {
                     script {
                         // Execute a shell command and capture its output
                         withCredentials([string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
-                            def lxc_ip = sh(script: 'tofu output -json lxc-ip', returnStdout: true).trim()
-                            def extractIpFromJson(lxc_ip) {
-                                def jsonSlurper = new JsonSlurper()
+                            def extractIpFromJson = { inputJson ->
+                                def jsonSlurper = new groovy.json.JsonSlurper()
                                 def jsonData = jsonSlurper.parseText(inputJson)
-                                
+                        
                                 jsonData.each { entry ->
-                                   env.LXC_IP = ${entry.ip}
+                                    env.LXC_IP = "${entry.ip}"
                                 }
                             }
+                            def lxc_ip = sh(script: 'tofu output -json lxc-ip', returnStdout: true).trim()
+                            extractIpFromJson(lxc_ip)
                             echo "Output from shell command: ${env.LXC_IP}"
                         }
                     }
