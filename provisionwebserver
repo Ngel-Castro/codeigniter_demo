@@ -83,7 +83,7 @@ pipeline {
         }
         stage('run ansible') {
             steps {
-                sh 'sleep 10'
+                sh 'ansible --version'
             }
         }
 
