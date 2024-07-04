@@ -66,7 +66,14 @@ pipeline {
                         // Execute a shell command and capture its output
                         withCredentials([string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                             def lxc_ip = sh(script: 'tofu output -json lxc-ip', returnStdout: true).trim()
-                            env.LXC_IP = lxc_ip
+                            def extractIpFromJson(lxc_ip) {
+                                def jsonSlurper = new JsonSlurper()
+                                def jsonData = jsonSlurper.parseText(inputJson)
+                                
+                                jsonData.each { entry ->
+                                   env.LXC_IP = ${entry.ip}
+                                }
+                            }
                             echo "Output from shell command: ${env.LXC_IP}"
                         }
                     }
@@ -87,7 +94,7 @@ pipeline {
                         usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
                         string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                         sh """
-                        tofu destroy -auto-approve -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        tofu destroy -auto-approve -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
                         """
                     }
                 }
