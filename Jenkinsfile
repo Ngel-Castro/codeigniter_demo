@@ -77,9 +77,9 @@ pipeline {
             steps {
                 sshagent([env.SSH_CREDENTIALS_ID]) {
                     sh """
-                    scp -o StrictHostKeyChecking=no deployment_script.sh root@${env.VM_IP}:/tmp/
-                    scp -o StrictHostKeyChecking=no app.conf root@${env.VM_IP}:${REMOTE_HOME}
-                    scp -r  -o StrictHostKeyChecking=no src/ root@${env.VM_IP}:${REMOTE_HOME}
+                    scp -o StrictHostKeyChecking=no deployment_script.sh root@${env.LXC_IP}:/tmp/
+                    scp -o StrictHostKeyChecking=no app.conf root@${env.LXC_IP}:${REMOTE_HOME}
+                    scp -r  -o StrictHostKeyChecking=no src/ root@${env.LXC_IP}:${REMOTE_HOME}
                     """
                 }
             }
@@ -91,7 +91,7 @@ pipeline {
                     // Connect to the remote server and execute command
                     sshagent([env.SSH_CREDENTIALS_ID]) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no root@${env.VM_IP} 'bash /tmp/deployment_script.sh'
+                        ssh -o StrictHostKeyChecking=no root@${env.LXC_IP} 'bash /tmp/deployment_script.sh'
                         """
                     }
                 }
