@@ -93,7 +93,7 @@ pipeline {
                             usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
                             string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
                             sh """
-                            ansible-playbook -i ${INVENTORY_FILE} -m ping
+                            ansible-playbook -i ${INVENTORY_FILE} main.yaml
                             cat ${env.INVENTORY_FILE}
                             """
                         }
