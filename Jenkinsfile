@@ -8,7 +8,7 @@ pipeline {
         TFVARS="env/dev/tofu.tfvars"
         SSH_CREDENTIALS_ID = "ssh-key-credential"
         PROXMOX_CREDENITALS_ID = "proxmox-credentials"
-        REMOTE_HOME = "/home/administrator/"
+        REMOTE_HOME = "/root/"
         CONSUL_CREDENTIAL_ID = "consul-sa-token"
     }
 
