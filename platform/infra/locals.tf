@@ -1,8 +1,8 @@
 locals {
   module_outputs  = {
-    for k, v in module.lxc_containers.container_vmids : k => {
+    for k, v in module.lxc_webcontainer.container_vmids : k => {
       "id"   = v
-      "ip"   = module.lxc_containers.container_ips[k]
+      "ip"   = module.lxc_webcontainer.container_ips[k]
     }
   }
 

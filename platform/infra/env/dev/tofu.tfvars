@@ -1,7 +1,7 @@
 environment       = "dev"
 containers = [
     { 
-        name            = "web_server", 
+        name            = "php-demo", 
         target_node     = "proxmox", 
         storage         = "Kingstone-data",
         storage_size    = "32G",

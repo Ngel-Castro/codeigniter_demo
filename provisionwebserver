@@ -1,0 +1,112 @@
+pipeline {
+    agent any
+    environment {
+        GIT_HASH = GIT_COMMIT.take(8)
+        //GIT_HASH = "test-sever"
+        // Directory to store the Terraform state file
+        //TF_STATE_DIR = "${WORKSPACE}/permament/terraform.tfstate"
+        TFVARS="env/dev/tofu.tfvars"
+        SSH_CREDENTIALS_ID = "ssh-key-credential"
+        PROXMOX_CREDENITALS_ID = "proxmox-credentials"
+        REMOTE_HOME = "/home/administrator/"
+        CONSUL_CREDENTIAL_ID = "consul-sa-token"
+    }
+
+    stages {
+
+        stage('Prepare State Directory') {
+            steps {
+                script {
+                    // Ensure the state directory exists
+                    sh "mkdir -p ${env.TF_STATE_DIR}"
+                }
+            }
+        }
+
+        stage('tofu Init') {
+            steps {
+                // Change directory to 'tofu' and initialize tofu
+                dir('platform/infra') {
+                    withCredentials([string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                        sh """
+                        tofu init -backend-config="address=consul-prod.home:8500"
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('tofu Plan') {
+            steps {
+                // Change directory to 'tofu' and plan the tofu changes
+                dir('platform/infra') {
+                    withCredentials([
+                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                        sh """
+                        tofu plan -out=tfplan -var-file=${env.TFVARS} -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('tofu Apply') {
+            steps {
+                // Change directory to 'tofu' and apply the planned changes
+                dir('platform/infra') {
+                    withCredentials([
+                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                        sh """
+                        tofu apply -auto-approve -var-file=${env.TFVARS} -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        """
+                    }
+                    script {
+                        // Execute a shell command and capture its output
+                        withCredentials([string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                            def lxc_ip = sh(script: 'tofu output -json lxc-ip', returnStdout: true).trim()
+                            env.LXC_IP = lxc_ip
+                            echo "Output from shell command: ${env.LXC_IP}"
+                        }
+                    }
+                }
+            }
+        }
+        stage('run ansible') {
+            steps {
+                sh 'sleep 10'
+            }
+        }
+
+        stage('tofu destroy') {
+            steps {
+                // Change directory to 'tofu' and apply the planned changes
+                dir('platform/infra') {
+                    withCredentials([
+                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                        sh """
+                        tofu destroy -auto-approve -var="name=${env.GIT_HASH}" -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        """
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up workspace after the job is done
+            cleanWs()
+        }
+        success {
+            // Actions to perform when the job succeeds
+            echo 'tofu Apply successful!'
+        }
+        failure {
+            // Actions to perform when the job fails
+            echo 'tofu Apply failed!'
+        }
+    }
+}

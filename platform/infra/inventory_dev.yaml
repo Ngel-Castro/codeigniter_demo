@@ -1,13 +1,11 @@
 all:
   children:
-%{ for idx, vm in jsondecode(vms_inventory) ~}
-  ${vm.name}:
+  php-demo:
         children:
           manager:
             hosts:
-              ${vm.name}1:
-                ansible_host: "${vm.ip}"
+              php-demo1:
+                ansible_host: "192.168.0.156"
                 ansible_user: "root"
                 ansible_ssh_private_key_file: '{{ cluster_ssh_key }}'
                 platform_environment: '{{ platform_environment }}'
-%{ endfor ~}
