@@ -87,20 +87,20 @@ pipeline {
             }
         }
 
-        stage('tofu destroy') {
-            steps {
-                // Change directory to 'tofu' and apply the planned changes
-                dir('platform/infra') {
-                    withCredentials([
-                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
-                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
-                        sh """
-                        tofu destroy -auto-approve -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
-                        """
-                    }
-                }
-            }
-        }
+        // stage('tofu destroy') {
+        //     steps {
+        //         // Change directory to 'tofu' and apply the planned changes
+        //         dir('platform/infra') {
+        //             withCredentials([
+        //                 usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+        //                 string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+        //                 sh """
+        //                 tofu destroy -auto-approve -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     post {
