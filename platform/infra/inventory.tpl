@@ -6,8 +6,8 @@ all:
             manager:
                 hosts:
                     ${vm.name}1:
-                    ansible_host: "${vm.ip}"
-                    ansible_user: "root"
-                    ansible_ssh_private_key_file: '{{ cluster_ssh_key }}'
-                    platform_environment: '{{ platform_environment }}'
+                        ansible_host: "${vm.ip}"
+                        ansible_user: "root"
+                        ansible_ssh_private_key_file: '{{ cluster_ssh_key }}'
+                        platform_environment: '{{ platform_environment }}'
 %{ endfor ~}
