@@ -87,13 +87,15 @@ pipeline {
         stage('run ansible') {
             steps {
                 dir('platform/ansible') {
-                    withCredentials([
-                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
-                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
-                        sh """
-                        ansible --version
-                        ls -la
-                        """
+                    sshagent([env.SSH_CREDENTIALS_ID]) {
+                        withCredentials([
+                            usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                            string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                            sh """
+                            ansible --version
+                            ls -la
+                            """
+                        }
                     }
                 }
             }
