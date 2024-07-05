@@ -1,0 +1,70 @@
+pipeline {
+    agent any
+    environment {
+        GIT_HASH = GIT_COMMIT.take(8)
+        //GIT_HASH = "test-sever"
+        // Directory to store the Terraform state file
+        //TF_STATE_DIR = "${WORKSPACE}/permament/terraform.tfstate"
+        TFVARS="env/dev/tofu.tfvars"
+        SSH_CREDENTIALS_ID = "ssh-key-credential"
+        PROXMOX_CREDENITALS_ID = "proxmox-credentials"
+        REMOTE_HOME = "/home/administrator/"
+        CONSUL_CREDENTIAL_ID = "consul-sa-token"
+        CONSUL_SERVER = "consul-prod.home"
+    }
+
+    stages {
+
+        stage('Prepare State Directory') {
+            steps {
+                script {
+                    // Ensure the state directory exists
+                    sh "mkdir -p ${env.TF_STATE_DIR}"
+                }
+            }
+        }
+
+        stage('tofu Init') {
+            steps {
+                // Change directory to 'tofu' and initialize tofu
+                dir('platform/infra') {
+                    withCredentials([string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                        sh """
+                        tofu init -backend-config="address=${env.CONSUL_SERVER}:8500"
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('tofu destroy') {
+            steps {
+                // Change directory to 'tofu' and apply the planned changes
+                dir('platform/infra') {
+                    withCredentials([
+                        usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                        string(credentialsId: env.CONSUL_CREDENTIAL_ID, variable: 'CONSUL_HTTP_TOKEN')]) {
+                        sh """
+                        tofu destroy -auto-approve -var="proxmox_token_id=${PROXMOX_TOKEN_ID}" -var="proxmox_token_secret=${PROXMOX_TOKEN_SECRET}"
+                        """
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up workspace after the job is done
+            cleanWs()
+        }
+        success {
+            // Actions to perform when the job succeeds
+            echo 'tofu Apply successful!'
+        }
+        failure {
+            // Actions to perform when the job fails
+            echo 'tofu Apply failed!'
+        }
+    }
+}
